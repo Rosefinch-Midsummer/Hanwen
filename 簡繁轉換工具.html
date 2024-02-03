@@ -174,6 +174,111 @@
                 <div id="content" class="content">
                     <main>
                         <h1 id="簡繁轉換工具"><a class="header" href="#簡繁轉換工具">簡繁轉換工具</a></h1>
+<ul>
+<li><a href="#%E7%AE%80%E6%98%93%E4%B8%AD%E6%96%87%E7%AE%80%E7%B9%81%E8%BD%AC%E6%8D%A2">简易中文简繁转换</a>
+<ul>
+<li><a href="#%E7%AE%80%E5%8D%95%E4%BD%BF%E7%94%A8">简单使用</a></li>
+<li><a href="#%E5%9C%A8spark%E9%9B%86%E7%BE%A4%E4%B8%AD%E4%BD%BF%E7%94%A8%E8%AF%A5%E9%A1%B9%E7%9B%AE">在Spark集群中使用该项目</a></li>
+<li><a href="#%E5%B0%8F%E5%B7%A5%E5%85%B7">小工具</a></li>
+</ul>
+</li>
+<li><a href="#open-chinese-convert-%E9%96%8B%E6%94%BE%E4%B8%AD%E6%96%87%E8%BD%89%E6%8F%9B">Open Chinese Convert 開放中文轉換</a>
+<ul>
+<li><a href="#features-%E7%89%B9%E9%BB%9E">Features 特點</a></li>
+<li><a href="#installation-%E5%AE%89%E8%A3%9D">installation 安裝</a></li>
+<li><a href="#usage-%E4%BD%BF%E7%94%A8">Usage 使用</a>
+<ul>
+<li><a href="#online-demo-%E7%B7%9A%E4%B8%8A%E8%BD%89%E6%8F%9B%E5%B1%95%E7%A4%BA">Online demo 線上轉換展示</a></li>
+<li><a href="#python">Python</a></li>
+<li><a href="#c">C++</a></li>
+<li><a href="#c-1">C</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h1 id="简易中文简繁转换"><a class="header" href="#简易中文简繁转换">简易中文简繁转换</a></h1>
+<p><a href="https://pythonhosted.org/zhconv/">文档</a></p>
+<p><strong>zhconv</strong> 提供基于 MediaWiki 和 OpenCC 词汇表的最大正向匹配简繁转换，支持地区词转换：zh-cn, zh-tw, zh-hk, zh-sg, zh-hans, zh-hant。Python 2、3通用。</p>
+<h2 id="简单使用"><a class="header" href="#简单使用">简单使用</a></h2>
+<p>若要求高精确度，参见 <a href="https://github.com/BYVoid/OpenCC">OpenCC</a> 和 <a href="https://pypi.python.org/pypi/opencc-python">opencc-python</a>。</p>
+<pre><code class="language-python">&gt;&gt;&gt; from zhconv import convert
+&gt;&gt;&gt; print(convert(u'我幹什麼不干你事。', 'zh-cn'))
+我干什么不干你事。
+&gt;&gt;&gt; print(convert(u'人体内存在很多微生物', 'zh-tw'))
+人體內存在很多微生物
+</code></pre>
+<p>其中，zh-hans, zh-hant 仅转换简繁，不转换地区词。</p>
+<p>完整支持 MediaWiki 人工转换语法：</p>
+<pre><code class="language-python">&gt;&gt;&gt; print(convert_for_mw(u'在现代，机械计算-{}-机的应用已经完全被电子计算-{}-机所取代', 'zh-hk'))
+在現代，機械計算機的應用已經完全被電子計算機所取代
+&gt;&gt;&gt; print(convert_for_mw(u'-{zh-hant:資訊工程;zh-hans:计算机工程学;}-是电子工程的一个分支，主要研究计算机软硬件和二者间的彼此联系。', 'zh-tw'))
+資訊工程是電子工程的一個分支，主要研究計算機軟硬體和二者間的彼此聯繫。
+&gt;&gt;&gt; print(convert_for_mw(u'張國榮曾在英國-{zh:利兹;zh-hans:利兹;zh-hk:列斯;zh-tw:里茲}-大学學習。', 'zh-sg'))
+张国荣曾在英国利兹大学学习。
+&gt;&gt;&gt; print(convert_for_mw('毫米(毫公分)，符號mm，是長度單位和降雨量單位，-{zh-hans:台湾作-{公釐}-或-{公厘}-;zh-hant:港澳和大陸稱為-{毫米}-（台灣亦有使用，但較常使用名稱為毫公分）;zh-mo:台灣作-{公釐}-或-{公厘}-;zh-hk:台灣作-{公釐}-或-{公厘}-;}-。', 'zh-cn'))
+毫米(毫公分)，符号mm，是长度单位和降雨量单位，台湾作公釐或公厘。
+</code></pre>
+<p>和其他<a href="https://zh.wikipedia.org/wiki/Help:%E9%AB%98%E7%BA%A7%E5%AD%97%E8%AF%8D%E8%BD%AC%E6%8D%A2%E8%AF%AD%E6%B3%95">高级字词转换语法</a>。</p>
+<p>转换字典可下载 <a href="https://www.mediawiki.org/wiki/Download">MediaWiki 源码包</a>中的 includes/ZhConversion.php，使用 convmwdict.py 可转换成 json 格式。</p>
+<p>代码授权协议采用 MIT 协议；转换表由于来自 MediaWiki，为 GPLv2+ 协议。</p>
+<h2 id="在spark集群中使用该项目"><a class="header" href="#在spark集群中使用该项目">在Spark集群中使用该项目</a></h2>
+<p>在分布式集群中，也许受环境限制，不便于在每台机器上安装该项目。 那么你可以从driver机器中单独上传该项目的<code>egg</code>文件，不需要依赖于其它的项目。</p>
+<pre><code># python setup.py bdist_egg
+
+# ls dist
+zhconv-1.2.2-py2.7.egg
+</code></pre>
+<p>如果在本地，则可以直接执行<code>sys.path.append('PATH_TO_ZHCONV/zhconv-1.2.2-py2.7.egg')</code>后使用。</p>
+<h2 id="小工具"><a class="header" href="#小工具">小工具</a></h2>
+<p>EPUB 电子书简繁转换：<code>python3</code> <a href="https://github.com/The-Orizon/nlputils/blob/master/epubzhconv.py">epubzhconv.py</a> <code>输入.epub 输出.epub zh-{cn,tw}</code></p>
+<h1 id="open-chinese-convert-開放中文轉換"><a class="header" href="#open-chinese-convert-開放中文轉換">Open Chinese Convert 開放中文轉換</a></h1>
+<p><a href="https://github.com/BYVoid/OpenCC">Open Chinese Convert 開放中文轉換</a></p>
+<p>Open Chinese Convert (OpenCC, 開放中文轉換) is an opensource project for conversions between Traditional Chinese, Simplified Chinese and Japanese Kanji (Shinjitai). It supports character-level and phrase-level conversion, character variant conversion and regional idioms among Mainland China, Taiwan and Hong Kong. This is not translation tool between Mandarin and Cantonese, etc.</p>
+<p>中文簡繁轉換開源項目，支持詞彙級別的轉換、異體字轉換和地區習慣用詞轉換（中國大陸、臺灣、香港、日本新字體）。不提供普通話與粵語的轉換。</p>
+<p>Discussion (Telegram): <a href="https://t.me/open_chinese_convert">https://t.me/open_chinese_convert</a></p>
+<h2 id="features-特點"><a class="header" href="#features-特點">Features 特點</a></h2>
+<ul>
+<li>嚴格區分「一簡對多繁」和「一簡對多異」。</li>
+<li>完全兼容異體字，可以實現動態替換。</li>
+<li>嚴格審校一簡對多繁詞條，原則爲「能分則不合」。</li>
+<li>支持中國大陸、臺灣、香港異體字和地區習慣用詞轉換，如「裏」「裡」、「鼠標」「滑鼠」。</li>
+<li>詞庫和函數庫完全分離，可以自由修改、導入、擴展。</li>
+</ul>
+<h2 id="installation-安裝"><a class="header" href="#installation-安裝">installation 安裝</a></h2>
+<p>See <a href="https://github.com/BYVoid/OpenCC/wiki/Download">Download</a>.</p>
+<h2 id="usage-使用"><a class="header" href="#usage-使用">Usage 使用</a></h2>
+<h3 id="online-demo-線上轉換展示"><a class="header" href="#online-demo-線上轉換展示">Online demo 線上轉換展示</a></h3>
+<p>Warning: <strong>This is NOT an API.</strong> You will be banned if you make calls programmatically.</p>
+<p><a href="https://opencc.byvoid.com/">https://opencc.byvoid.com/</a></p>
+<h3 id="python"><a class="header" href="#python">Python</a></h3>
+<p><a href="https://pypi.org/project/OpenCC/">PyPI</a> <code>pip install opencc</code> (Windows, Linux, Mac)</p>
+<pre><code class="language-python">import opencc
+converter = opencc.OpenCC('s2t.json')
+converter.convert('汉字')  # 漢字
+</code></pre>
+<h3 id="c"><a class="header" href="#c">C++</a></h3>
+<pre><code class="language-c">#include &quot;opencc.h&quot;
+
+int main() {
+  const opencc::SimpleConverter converter(&quot;s2t.json&quot;);
+  converter.Convert(&quot;汉字&quot;);  // 漢字
+  return 0;
+}
+</code></pre>
+<h3 id="c-1"><a class="header" href="#c-1">C</a></h3>
+<pre><code class="language-c">#include &quot;opencc.h&quot;
+
+int main() {
+  opencc_t opencc = opencc_open(&quot;s2t.json&quot;);
+  const char* input = &quot;汉字&quot;;
+  char* converted = opencc_convert_utf8(opencc, input, strlen(input));  // 漢字
+  opencc_convert_utf8_free(converted);
+  opencc_close(opencc);
+  return 0;
+}
+</code></pre>
+<p>Document 文檔: <a href="https://byvoid.github.io/OpenCC/">https://byvoid.github.io/OpenCC/</a></p>
 
                     </main>
 
